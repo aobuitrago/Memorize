@@ -13,8 +13,7 @@ struct ContentView: View {
                   ["🐶","🐱","🦊","🐼", "🐨", "🐮", "🐷", "🐵", "🐔", "🐧", "🐙","🦋"],
                   ["🥨","🍐","🍊","🍋", "🍌", "🥕", "🍇", "🍓", "🌽", "🍒", "🍔","🧀"]]
     
-    @State var cardCount: Int = 4
-    @State var theme: Int = 0
+    @State var currentEmojiList: [String] = []
 
     var body: some View {
         VStack {
@@ -29,13 +28,20 @@ struct ContentView: View {
     }
     
     var cards: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 120))]) {
-            ForEach(0..<cardCount, id: \.self) { index in
-                CardView(content: emojis[theme][index])
-                    .aspectRatio(2/3, contentMode: .fit)
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 60))]) {
+            if currentEmojiList.count > 0 {
+                ForEach(0..<currentEmojiList.count, id: \.self) { index in
+                    CardView(content: currentEmojiList[index])
+                        .aspectRatio(2/3, contentMode: .fit)
+                }
             }
         }
         .foregroundColor(.orange)
+    }
+    
+    func changeEmojiList(theme: Int) {
+        currentEmojiList = emojis[theme] + emojis[theme]
+        currentEmojiList.shuffle()
     }
     
     var title: some View {
@@ -43,20 +49,20 @@ struct ContentView: View {
     }
     
     var themeAdjusters: some View {
-        HStack {
+        HStack(alignment: .lastTextBaseline, content: {
             halloweenSelector
             Spacer()
             animalSelector
             Spacer()
             fruitSelector
-        }
+        })
         .padding(.horizontal, 40)
     }
     
     func themeSelector(by offset: Int, themeTitle: String, symbol: String) -> some View {
         Button(
             action: {
-                theme = offset
+                changeEmojiList(theme: offset)
             },
             label: {
                 VStack() {
@@ -82,7 +88,7 @@ struct ContentView: View {
 
 struct CardView: View {
     let content: String
-    @State var isFaceUp = true
+    @State var isFaceUp = false
     
     var body: some View {
         ZStack {
