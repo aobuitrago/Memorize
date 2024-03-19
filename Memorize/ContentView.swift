@@ -8,16 +8,22 @@
 import SwiftUI
 
 struct ContentView: View {
-    let emojis = ["👻","🎃","🕷️","😈", "💀", "🕸️", "🧙🏻", "🙀", "🦁", "😱", "☠️","🍭"]
+    let emojis = [["👻","🎃","🕷️","😈", "💀", "🕸️", "🧙🏻", "🙀", "🦁", "😱", "☠️","🍭"],
+                  ["🚗","🚕","🚌","🚎", "🏎️", "🚓", "🚑", "🚒", "🏍️", "🛵", "🛴","🚲"],
+                  ["🐶","🐱","🦊","🐼", "🐨", "🐮", "🐷", "🐵", "🐔", "🐧", "🐙","🦋"],
+                  ["🥨","🍐","🍊","🍋", "🍌", "🥕", "🍇", "🍓", "🌽", "🍒", "🍔","🧀"]]
+    
     @State var cardCount: Int = 4
+    @State var theme: Int = 0
 
     var body: some View {
         VStack {
+            title
             ScrollView {
                 cards
             }
             Spacer()
-            cardCountAdjusters
+            themeAdjusters
         }
         .padding()
     }
@@ -25,38 +31,52 @@ struct ContentView: View {
     var cards: some View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 120))]) {
             ForEach(0..<cardCount, id: \.self) { index in
-                CardView(content: emojis[index])
+                CardView(content: emojis[theme][index])
                     .aspectRatio(2/3, contentMode: .fit)
             }
         }
         .foregroundColor(.orange)
     }
     
-    var cardCountAdjusters: some View {
+    var title: some View {
+        Text("Memorize!").font(.largeTitle)
+    }
+    
+    var themeAdjusters: some View {
         HStack {
-            cardRemover
+            halloweenSelector
             Spacer()
-            cardAdder
+            animalSelector
+            Spacer()
+            fruitSelector
         }
-        .imageScale(.large)
-        .font(.largeTitle)
+        .padding(.horizontal, 40)
     }
     
-    func cardCountAdjuster(by offset: Int, symbol: String) -> some View {
-        Button(action: {
-            cardCount += offset
-        }, label: {
-            Image(systemName: symbol)
+    func themeSelector(by offset: Int, themeTitle: String, symbol: String) -> some View {
+        Button(
+            action: {
+                theme = offset
+            },
+            label: {
+                VStack() {
+                    Image(systemName: symbol).font(.title)
+                    Text(themeTitle)
+                        .font(.caption)
+            }
         })
-        .disabled(cardCount + offset < 1 || cardCount + offset > emojis.count)
     }
     
-    var cardRemover: some View {
-        cardCountAdjuster(by: -1, symbol: "rectangle.stack.badge.minus.fill")
+    var halloweenSelector: some View {
+        themeSelector(by: 1, themeTitle: "Vehicles", symbol: "car") // symbol is an SF Symbol
     }
     
-    var cardAdder: some View {
-        cardCountAdjuster(by: 1, symbol: "rectangle.stack.badge.plus.fill")
+    var animalSelector: some View {
+        themeSelector(by: 2, themeTitle: "Animals", symbol: "cat") // symbol is an SF Symbol
+    }
+    
+    var fruitSelector: some View {
+        themeSelector(by: 3, themeTitle: "Food", symbol: "carrot") // symbol is an SF Symbol
     }
 }
 
